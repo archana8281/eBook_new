@@ -28,6 +28,20 @@ class User extends Model
             ->from('users')->fetchAllAssociative();
     }
 
+    public function checkOne(string $email, string $password)
+    {
+        $result = $this->queryBuilder->select('name', 'email', 'password')
+            ->from('users')
+            ->where('email = ?')
+            ->andWhere('password = ?')
+            ->setParameter(0, $email)
+            ->setParameter(1, $password)
+            ->executeQuery()
+            ->fetchAssociative();
+
+        return $result ? true : false;
+    }
+
     public function check(string $email, string $password)
     {
         $stmt = $this->queryBuilder->select('name', 'email', 'password', 'subject')
@@ -38,7 +52,7 @@ class User extends Model
             ->setParameter(1, $password)
             ->executeQuery()
             ->fetchAssociative();
-            
+
         $token = null;
         if ($stmt) {
             $secret_key = "YOUR_SECRET_KEY";
@@ -52,7 +66,6 @@ class User extends Model
             );
             $jwt = JWT::encode($token, $secret_key, $algorithm);
         }
-print_r($token);
         return $token ? $jwt : false;
     }
 
